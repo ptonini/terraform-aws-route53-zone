@@ -6,8 +6,8 @@ variable "root_records" {
 
 variable "records" {
   type = list(object({
-    name = string
-    type = string
+    name    = string
+    type    = string
     records = list(string)
   }))
   default = []
