@@ -8,6 +8,34 @@ resource "aws_route53_zone" "this" {
   }
 }
 
+module "policy" {
+  source  = "ptonini/iam-policy/aws"
+  version = "~> 1.0.0"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "route53:ListHostedZones",
+          "route53:GetChange"
+        ],
+        Resource = ["*"]
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "route53:ListResourceRecordSets",
+          "route53:ChangeResourceRecordSets"
+        ],
+        Resource = [
+          "arn:aws:route53:::hostedzone/${aws_route53_zone.this.id}",
+        ]
+      }
+    ]
+  })
+}
+
 module "root_record" {
   source       = "ptonini/route53-record/aws"
   version      = "~> 1.0.0"
