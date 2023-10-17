@@ -1,5 +1,5 @@
 resource "aws_route53_zone" "this" {
-  name = var.domain
+  name = var.name
   lifecycle {
     ignore_changes = [
       tags,
@@ -40,13 +40,10 @@ module "root_record" {
   source       = "ptonini/route53-record/aws"
   version      = "~> 1.0.0"
   for_each     = var.root_records
-  name         = var.domain
+  name         = var.name
   route53_zone = aws_route53_zone.this
   type         = each.key
   records      = each.value
-  providers = {
-    aws = aws
-  }
 }
 
 module "record" {
@@ -57,7 +54,4 @@ module "record" {
   route53_zone = aws_route53_zone.this
   type         = each.value["type"]
   records      = each.value["records"]
-  providers = {
-    aws = aws
-  }
 }

@@ -1,4 +1,4 @@
-variable "domain" {}
+variable "name" {}
 
 variable "root_records" {
   default = {}
