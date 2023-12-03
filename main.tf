@@ -1,8 +1,11 @@
 resource "aws_route53_zone" "this" {
   name = var.name
+
   lifecycle {
     ignore_changes = [
-      tags,
+      tags["business_unit"],
+      tags["product"],
+      tags["env"],
       tags_all
     ]
   }
