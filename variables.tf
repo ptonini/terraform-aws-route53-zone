@@ -1,14 +1,14 @@
 variable "name" {}
 
 variable "root_records" {
+  type    = map(string)
   default = {}
 }
 
 variable "records" {
-  type = list(object({
-    name    = string
-    type    = string
-    records = list(string)
+  type = map(object({
+    type    = optional(string)
+    records = set(string)
   }))
-  default = []
+  default = {}
 }

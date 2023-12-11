@@ -13,48 +13,46 @@ resource "aws_route53_zone" "this" {
 
 module "policy" {
   source  = "ptonini/iam-policy/aws"
-  version = "~> 1.0.0"
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "route53:ListHostedZones",
-          "route53:GetChange"
-        ],
-        Resource = ["*"]
-      },
-      {
-        Effect = "Allow",
-        Action = [
-          "route53:ListResourceRecordSets",
-          "route53:ChangeResourceRecordSets"
-        ],
-        Resource = [
-          "arn:aws:route53:::hostedzone/${aws_route53_zone.this.id}",
-        ]
-      }
-    ]
-  })
+  version = "~> 2.0.0"
+  name    = "${var.name}-zone-access-policy"
+  statement = [
+    {
+      Effect = "Allow"
+      Action = [
+        "route53:ListHostedZones",
+        "route53:GetChange"
+      ],
+      Resource = ["*"]
+    },
+    {
+      Effect = "Allow",
+      Action = [
+        "route53:ListResourceRecordSets",
+        "route53:ChangeResourceRecordSets"
+      ],
+      Resource = [
+        "arn:aws:route53:::hostedzone/${aws_route53_zone.this.id}",
+      ]
+    }
+  ]
 }
 
 module "root_record" {
-  source       = "ptonini/route53-record/aws"
-  version      = "~> 1.0.0"
-  for_each     = var.root_records
-  name         = var.name
-  route53_zone = aws_route53_zone.this
-  type         = each.key
-  records      = each.value
+  source   = "ptonini/route53-record/aws"
+  version  = "~> 1.1.0"
+  for_each = var.root_records
+  name     = var.name
+  zone_id  = aws_route53_zone.this.id
+  type     = each.key
+  records  = each.value
 }
 
 module "record" {
-  source       = "ptonini/route53-record/aws"
-  version      = "~> 1.0.0"
-  for_each     = { for r in var.records : "${r["name"]}_${r["type"]}" => r }
-  name         = each.value["name"]
-  route53_zone = aws_route53_zone.this
-  type         = each.value["type"]
-  records      = each.value["records"]
+  source   = "ptonini/route53-record/aws"
+  version  = "~> 1.1.0"
+  for_each = var.records
+  name     = each.key
+  zone_id  = aws_route53_zone.this.id
+  type     = each.value.type
+  records  = each.value.records
 }
