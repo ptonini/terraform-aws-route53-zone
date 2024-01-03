@@ -1,7 +1,7 @@
 variable "name" {}
 
 variable "root_records" {
-  type    = map(string)
+  type    = map(list(string))
   default = {}
 }
 
